@@ -1,0 +1,21 @@
+Package: kmodesFlow
+Title: Improved Workflow with Kmodes Models
+Version: 0.0.0.9000
+Authors@R: 
+    person("Sean", "Bock", email = "seanbock@g.harvard.edu", role = c("aut", "cre"))
+Description: kmodesFlow includes helper functions to improve workflow with kmodes models. The package relies on the kmodes algorthim from the klaR package.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: 
+    dplyr,
+    ggplot2,
+    ggthemes,
+    gt,
+    gtExtras,
+    klaR,
+    purrr,
+    scales,
+    tibble,
+    tidyr
