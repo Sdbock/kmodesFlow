@@ -19,3 +19,5 @@ Imports:
     scales,
     tibble,
     tidyr
+URL: https://github.com/Sdbock/kmodesFlow
+BugReports: https://github.com/Sdbock/kmodesFlow/issues
