@@ -18,6 +18,8 @@ fit_models <-
 
   function(data, k_range = 1:4, seed = NULL, weighted = FALSE ) {
 
+    library(magrittr)
+
     dplyr::tibble(
       k = k_range
     ) %>%
@@ -29,7 +31,7 @@ fit_models <-
       cluster_distribution = purrr::map(model, cluster_dist),
       df = purrr::map(model, ~ add_clusters(model = .x, data = data)),
       attribute_distribution = purrr::map(model, ~ get_att_dist(model = .x, data = data)),
-      table_attribute_distribution = purrr::map(model, table_att_dist),
+      table_attribute_distribution = purrr::map(model, ~table_att_dist(model = .x, data = data)),
       table_cluster_modes = purrr::map(model,~ table_cluster_modes(model = .x, data = data))
       )
   }

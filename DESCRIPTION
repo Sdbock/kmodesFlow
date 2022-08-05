@@ -15,6 +15,7 @@ Imports:
     gt,
     gtExtras,
     klaR,
+    magrittr,
     purrr,
     scales,
     tibble,
