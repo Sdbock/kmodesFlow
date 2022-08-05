@@ -1,10 +1,10 @@
 #' @title fit_models
 #'
-#' @returns Tibble with results for each model
+#' @returns Large tibble with results for each model
 #' @description Fit x number of kmodes models specified with range of clustering solutions.
 #' @param data data used to fit kmodes models. All variables must be numeric with no missing values.
 #' @param k_range range of clustering solutions to fit. Defaults to 1:4
-#' @param seed optional random seed. Defaults to `Null`
+#' @param seed optional random seed. Defaults to `NUll`
 #' @param weighted Optional weighted version of distance algorithm.
 #'
 #' @return
