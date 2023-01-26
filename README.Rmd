@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of kmodesFlow is to improve workflow efficiency when using kmodes models.
+The *kmodesFlow* package provides convenience functions to accompany the *klaR::kmodes()* function, improving overall workflow with kmodes modeling. It allows users to easily fit multiple models, assess model fit, and examine results with automated visualizations.
 
 ## Installation
 
@@ -31,160 +31,37 @@ devtools::install_github("Sdbock/kmodesFlow")
 
 ## Tutorial
 
+The workhorse of the *kmodesFlow* package is the *fit_models()* function. To fit 8 models, with 1 through 8-k solutions, simply specify "1:8" as the number for k: 
 
-The *kmodesFlow* package provides convience functions to accompany the *klaR::kmodes()* function, improving overall workflow with kmodes modeling. To demo the functionality of the package, I will use a dataset on Telco customer churn (see more on the data here: https://www.kaggle.com/datasets/blastchar/telco-customer-churn).
+```{r eval = FALSE}
+library(kmodesFlow)
 
-## Loading data and packages 
-
-```{r}
-library(kmodesFlow) # loading package
-library(tidyverse)
-
-data <- read_csv("telco_customer_churn.csv") # loading data as tibble after downloading
-
-glimpse(data)
-```
-## Cleaning data
-The data contains several categorical variables on customer behavior and details about their accounts. The outcome of interest here is the "Churn" variable. Are there certain latent groups of customers based on the available variables, and are these groups predictive of customer church? This is a task for kmodes clustering! 
-
-The workhorse of the *kmodesFlow* package is the *fit_models()* function. Because we do not know the optimal numbers of clusters beforehand, we must run several models, and select the number of clusters based on model fit and substantive interpretation. *fit_models()* allows us to easily run multiple models, trying out different values of $k$. Let's fit 8 models, with 1:8 k-clustering solutions. I will also set a seed, so that we can reproduce results if wanted.
-
-Before we fit our models, there is a bit of data cleaning that needs to be done. The *MonthlyCharges*, *TotalCharges*, *Tenure*, and *SeniorCitizen* variables are all coded as numeric. To include these variables in our model, we must convert these into categorical variables.
- 
-```{r}
-# converting continuous variables into categorical by quartiles
-data_r <- 
-  data %>%
-  mutate(SeniorCitizen = if_else(SeniorCitizen == 1, "Yes", "No"),
-         MonthlyCharges = as.character(ntile(MonthlyCharges, 4)), 
-         TotalCharges = as.character(ntile(TotalCharges, 4)),
-         tenure = as.character(ntile(tenure, 4)))
-
-glimpse(data_r)
-```
-Next, we need to check for missing values, as fit_models() only excepts columns with non-missing data.
-
-
-```{r}
-sum(is.na(data_r))
-```
-Looks like there are 11 missing values. Because there are only 11, let's go ahead and delete them. 
-
-
-```{r}
-data_r <-
-  data_r %>% 
-  drop_na()
-
-sum(is.na(data_r))
+fit_models(
+  data = data,
+  k = 1:8,
+  seed = 1234
+)
 ```
 
-Great, now we have all categorical variables with no missing values. We're ready to fit our models. 
+The *fit_models()* returns a tibble with the number of rows equal to the number of models specified. The columns contain information about cluster assignment for respondents, model fit, and visualization of cluster profiles. To examine the modal category for each variable within clusters, print the *table_cluster_modes* column for the relevant model. I suggest using the *pluck()* function to identify and print the desired row and column. To look at the modes across clusters for the $k = 3$ model: 
 
-## Fitting models
-
-```{r}
-models_fit <- 
-  fit_models(data = data_r %>% 
-                    select(-c(Churn, customerID)), # removing ID and outcome variable (churn)
-             k = 1:8, # specificying 1 through 8 values for k
-             seed = 1234) # setting random seed
+```{r eval = FALSE}
+pluck(model_output, "table_cluster_modes", 3)
 ```
 
-```{r}
-glimpse(models_fit)
-```
-*fit_models()* returns a large tibble containing various information about each model. Each row in the tibble pertains to a separate model specification. 
+There is also a heat map of the distributions of variable levels within each cluster, which can be accessed in the "table_attribute_distribution" column:
 
-## Assessing model fit
-Which value of $k$ should we use? The *plot_elbow()* function takes the model output, and plots the within-cluster sum of squares, allowing users to quickly implement the "elbow method" to identify the number of clusters. 
-
-```{r}
-plot_elbow(models_fit)
+```{r eval = FALSE}
+pluck(model_output, "table_attribute_distribution", 3)
 ```
 
-Based on the elbow plot, it appears that 3 clusters is our optimal solution, with 4 also being a possibilty. Let's go ahead with the 3-cluster solution. What do these clusters look like? The output from *fit_models()* contains two tables to analyze the profile of each cluster. 
+Finally, the  *plot_elbow()* function takes a *fit_models()* output and returns a plot of the sum of within-cluster differences across each level of $k$. This "elbow" plot is a common tool in determining the optimal number of clusters.
 
-## Assessing clusters 
-
-The first table identifies the modal category for each variable within each cluster. It also dispalys the relative proportions of each cluster. To view this table, we simply print the table for the 3-cluster solution within our *models_fit* tibble. 
-
-```{r}
-pluck(models_fit, "table_cluster_modes", 3) # priting the table_cluster_modes column in the 3rd row
+```{r eval = FALSE}
+plot_elbow(model_output)
 ```
 
-Another way of viewing the make-up of each cluster is by looking at the distribution of attribute levels within each cluster. These distributions are displayed by a heat map in the *table_attribute_distribution* column. 
 
-```{r}
-pluck(models_fit, "table_attribute_distribution", 3)
-```
-
-Looking through these two tables, there does appear to be clear variation across clusters, which means that our clustering model did a good job of identifying latent groups within the data. Are these groups predictive of churn? 
-
-## Using clusters to predict distal outcome
-
-To assess the relationship between cluster membership and churn, we must merge the church variable in with our data that contains cluster assignment. To get the latter, we can simply access the *df* column, which contains all columns used in our model, as well as cluster assignment. I'll save this data as "clusters".
-
-```{r}
-clusters <- 
-models_fit %>% 
-  pluck("df", 3)
-```
-
-Because row ordering was retained, we can add the churn variable to *clusters* from the *data_r* tibble with *mutate()*. 
-
-```{r}
-clusters_r <- 
-  clusters %>% 
-  mutate(churn = data_r$Churn)
-
-glimpse(clusters_r)
-```
-Now we will test if there are differences between groups in churn using logistic regression.
+See Demo for a fuller overview of the *kmodesFlow* package.
 
 
-```{r}
-library(marginaleffects)
-
-logit_fit <- 
-clusters_r %>% 
-  mutate(churn = if_else(churn == "Yes", 1, 0)) %>% 
-  glm(churn ~ cluster,
-      data = .,
-      family = "binomial") 
-
-ame_plot <- 
-logit_fit %>% 
-  marginaleffects::marginaleffects() %>% 
-  summary() %>% 
-  ggplot(aes(x = contrast, y = estimate)) +
-  geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
-  coord_flip() +
-  geom_hline(yintercept = 0,
-             linetype = "dotted") +
-  labs(
-    x = "Average Marginal Effect",
-    y = "Cluster contrasts",
-    title = str_wrap("Average Marginal Effects of Cluster Membership on Customer Churn", width = 40)
-  ) +
-  theme_classic()
-  
-pr_plot <-
-logit_fit %>% 
-  marginaleffects::marginalmeans() %>% 
-  summary() %>% 
-  ggplot(aes(x = value, y = estimate)) +
-  geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
-  labs(
-    x = "Pr(Churn)",
-    y = "Cluster assignment",
-    title = str_wrap("Probability of Churn by Cluster Assignment", width = 40)) +
-  theme_classic()
-
-
-library(patchwork)
-
-pr_plot + ame_plot 
-```
-
-Cluster membership appears to be a strong predictor of churn, indicating that our clustering model is identifying meaningful sub-groups among customers.
