@@ -6,9 +6,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The *kmodesFlow* package provides convenience functions to accompany the
-*klaR::kmodes()* function, improving overall workflow with kmodes
-modeling. It allows users to easily fit multiple models, assess model
+The *kmodesFlow* package provides convenience functions to improve workflow with kmodes modeling.
+It allows users to easily fit multiple models, assess model
 fit, and examine results with automated visualizations.
 
 ## Installation
