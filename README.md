@@ -69,4 +69,4 @@ clusters.
 plot_elbow(model_output)
 ```
 
-See Demo for a fuller overview of the *kmodesFlow* package.
+For a fuller overview, see the `kmodesFlow` [demo](https://sdbock.github.io/kmodesFlow/).
