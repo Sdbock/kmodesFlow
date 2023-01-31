@@ -3,7 +3,7 @@ title: kmodesFlow Demo
 author: Sean Bock
 ---
 
-The *kmodesFlow* package provides a set of convenience functions to accompany the *klaR::kmodes()* function, improving overall workflow with kmodes modeling. To demo the functionality of the package, I will use a dataset on Telco customer churn (see more on the data here: https://www.kaggle.com/datasets/blastchar/telco-customer-churn).
+The `kmodesFlow` package provides a set of convenience functions to accompany the `klaR::kmodes()` function, improving overall workflow with kmodes modeling. To demo the functionality of the package, I will use a dataset on Telco customer churn (see more on the data here: https://www.kaggle.com/datasets/blastchar/telco-customer-churn).
 
 ## Loading data and packages 
 
@@ -18,9 +18,9 @@ glimpse(data)
 ## Cleaning data
 The data contains several categorical variables on customer behavior and details about their accounts. The outcome of interest here is the "Churn" variable. Are there certain latent groups of customers based on the available variables, and are these groups predictive of customer church? This is a task for kmodes clustering! 
 
-The workhorse of the *kmodesFlow* package is the *fit_models()* function. Because we do not know the optimal numbers of clusters beforehand, we must run several models, and select the number of clusters based on model fit and substantive interpretation. *fit_models()* allows us to easily run multiple models, trying out different values of $k$. Let's fit 8 models, with 1:8 k-clustering solutions. I will also set a seed, so that we can reproduce results if wanted.
+The workhorse of the `kmodesFlow` package is the `fit_models()` function. Because we do not know the optimal numbers of clusters beforehand, we must run several models, and select the number of clusters based on model fit and substantive interpretation. `fit_models()` allows us to easily run multiple models, trying out different values of $k$. Let's fit 8 models, with 1:8 k-clustering solutions. I will also set a seed, so that we can reproduce results if wanted.
 
-Before we fit our models, there is a bit of data cleaning that needs to be done. The *MonthlyCharges*, *TotalCharges*, *Tenure*, and *SeniorCitizen* variables are all coded as numeric. To include these variables in our model, we must convert these into categorical variables.
+Before we fit our models, there is a bit of data cleaning that needs to be done. The `MonthlyCharges`, `TotalCharges`, `Tenure`, and `SeniorCitizen` variables are all coded as numeric. To include these variables in our model, we must convert these into categorical variables.
  
 ```{r}
 # converting continuous variables into categorical by quartiles
@@ -65,26 +65,26 @@ models_fit <-
 ```{r}
 glimpse(models_fit)
 ```
-*fit_models()* returns a large tibble containing various information about each model. Each row in the tibble pertains to a separate model specification. 
+`fit_models()` returns a large tibble containing various information about each model. Each row in the tibble pertains to a separate model specification. 
 
 ## Assessing model fit
-Which value of $k$ should we use? The *plot_elbow()* function takes the model output, and plots the within-cluster sum of squares, allowing users to quickly implement the "elbow method" to identify the number of clusters. 
+Which value of $k$ should we use? The `plot_elbow()` function takes the model output, and plots the within-cluster sum of squares, allowing users to quickly implement the "elbow method" to identify the number of clusters. 
 
 ```{r}
 plot_elbow(models_fit)
 ```
 
-Based on the elbow plot, it appears that 3 clusters is our optimal solution, with 4 also being a possibilty. Let's go ahead with the 3-cluster solution. What do these clusters look like? The output from *fit_models()* contains two tables to analyze the profile of each cluster. 
+Based on the elbow plot, it appears that 3 clusters is our optimal solution, with 4 also being a possibilty. Let's go ahead with the 3-cluster solution. What do these clusters look like? The output from `fit_models()` contains two tables to analyze the profile of each cluster. 
 
 ## Assessing clusters 
 
-The first table identifies the modal category for each variable within each cluster. It also dispalys the relative proportions of each cluster. To view this table, we simply print the table for the 3-cluster solution within our *models_fit* tibble. 
+The first table identifies the modal category for each variable within each cluster. It also dispalys the relative proportions of each cluster. To view this table, we simply print the table for the 3-cluster solution within our `models_fit` tibble. 
 
 ```{r}
 pluck(models_fit, "table_cluster_modes", 3) # priting the table_cluster_modes column in the 3rd row
 ```
 
-Another way of viewing the make-up of each cluster is by looking at the distribution of attribute levels within each cluster. These distributions are displayed by a heat map in the *table_attribute_distribution* column. 
+Another way of viewing the make-up of each cluster is by looking at the distribution of attribute levels within each cluster. These distributions are displayed by a heat map in the `table_attribute_distribution` column. 
 
 ```{r}
 pluck(models_fit, "table_attribute_distribution", 3)
@@ -94,7 +94,7 @@ Looking through these two tables, there does appear to be clear variation across
 
 ## Using clusters to predict distal outcome
 
-To assess the relationship between cluster membership and churn, we must merge the church variable in with our data that contains cluster assignment. To get the latter, we can simply access the *df* column, which contains all columns used in our model, as well as cluster assignment. I'll save this data as "clusters".
+To assess the relationship between cluster membership and churn, we must merge the church variable in with our data that contains cluster assignment. To get the latter, we can simply access the `df` column, which contains all columns used in our model, as well as cluster assignment. I'll save this data as "clusters".
 
 ```{r}
 clusters <- 
@@ -102,7 +102,7 @@ models_fit %>%
   pluck("df", 3)
 ```
 
-Because row ordering was retained, we can add the churn variable to *clusters* from the *data_r* tibble with *mutate()*. 
+Because row ordering was retained, we can add the churn variable to `clusters` from the `data_r` tibble with `mutate()`. 
 
 ```{r}
 clusters_r <- 
