@@ -1,5 +1,6 @@
 ---
-title: kmodesFlow
+title: kmodesFlow Demo
+author: Sean Bock
 ---
 
 The *kmodesFlow* package provides a set of convenience functions to accompany the *klaR::kmodes()* function, improving overall workflow with kmodes modeling. To demo the functionality of the package, I will use a dataset on Telco customer churn (see more on the data here: https://www.kaggle.com/datasets/blastchar/telco-customer-churn).
