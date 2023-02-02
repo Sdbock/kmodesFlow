@@ -8,7 +8,7 @@
 
 The `kmodesFlow` package provides convenience functions to improve workflow with kmodes modeling.
 It allows users to easily fit multiple models, assess model
-fit, and examine results with automated visualizations.
+fit, and examine results with automated visualizations. See full demo [here](https://sdbock.github.io/kmodesFlow/).
 
 ## Installation
 
@@ -69,4 +69,4 @@ clusters.
 plot_elbow(model_output)
 ```
 
-For a fuller overview, see the `kmodesFlow` [demo](https://sdbock.github.io/kmodesFlow/).
+
